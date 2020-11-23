@@ -7,15 +7,15 @@ from requests.exceptions import RequestException
 load_dotenv()
 
 def get_summoner_by_name(summoner_name):
-    """[Requests a summoner DTO from the Riot API for a given summoner name]
+    """Requests a summonerDto from the Riot API for a given summoner name
 
     Args:
         summoner_name ([string]): [The summoner name of the user being searched for. This is the name
         that they will use in games.]
 
     Returns:
-        [dictionary]: [Returns the content of the response. Keys: id, accountId, puuid, name, profileIconId, revisionDate
-        summonerLevel]
+        [dictionary]: Returns the content of the response. Keys: id, accountId, puuid, name, profileIconId, revisionDate
+        summonerLevel
     """
     api_key = os.getenv("API_KEY")
 
@@ -43,3 +43,65 @@ def get_summoner_by_name(summoner_name):
         }
     except (KeyError, TypeError, ValueError):
         return None
+
+def get_matches_for_account(account_id, champion=None, queue=None, season=None, endTime=None, beginTime=None, endIndex=None, beginIndex=None):
+    """Requests a MatchlistDto from the Riot Match API. This contains a series of MatchReferenceDtos, each containing:
+    gameId: long
+    role: string
+    season: int
+    platformId: string
+    champion: int
+    queue: int
+    lane: string
+    timestamp: long
+    
+    Args:
+        account_id (string): Encrypted accountId. This is returned in the summonerDto from the get_summoner_by_name function.
+        champion (int, optional): Champion key. The value that corresponds to each champion can be found in champions.json. Defaults to None.
+        queue (int, optional): Queue key. The value that corresponds to each queue can be found in queues.json.  Defaults to None.
+        season (int, optional): Corresponds to the season. Riot's API documentation specifies this as deprecated, so do not rely on it. Defaults to None.
+        endTime (long, optional): The end time to use for filtering the matchlist specified as epoch milliseconds. If beginTime is specified but not endTime, endTime defaults to the current timestamp in milliseconds. Defaults to None.
+        beginTime (long, optional): The begin time to use for filtering the matchlist specified as epoch milliseconds. If beginTime is specified but not endTime, endTime defaults to the current timestamp in milliseconds. Defaults to None.
+        endIndex (int, optional): The end index to use for filtering the matchlist. If beginIndex is specified but not endIndex, endIndex defaults to beginIndex+100. The maximum range allowed is 100. Defaults to None.
+        beginIndex (int, optional): The begin index to use for filtering the matchlist. If beginIndex is specified but not endIndex, endIndex defaults to beginIndex+100. The maximum range allowed is 100. Defaults to None.
+
+    Returns:
+        [dict]: Returns a dictionary containing a list of match references, each denoting a game played. This is followed by values for the keys: startIndex, endIndex, totalGames.
+    """
+    api_key = os.getenv("API_KEY")
+
+    # Arrange headers
+    headers_dict = {"X-Riot-Token":api_key}
+
+    # Get response from Match API, check for errors
+    try:
+        # Update parameters dictionary with optional parameters from call
+        parameters={
+            "champion": champion,
+            "queue": queue,
+            "season": season,
+            "endTime": endTime,
+            "beginTime": beginTime,
+            "endIndex": endIndex,
+            "beginIndex": beginIndex    
+        }
+
+        # Make request call
+        response = requests.get(f"https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/{account_id}", headers=headers_dict, params=parameters)
+        response.raise_for_status()
+    except requests.RequestException:
+        return None
+
+    # Parse result
+    try:
+        response_content = response.content
+        json_response_content = json.loads(response_content.decode('utf-8'))
+        return json_response_content
+    except (KeyError, TypeError, ValueError):
+        return None
+
+# Basic Integration Test:
+
+#george = get_summoner_by_name("George")
+#george_ekko_matches = get_matches_for_account(george["account_id"], 245)
+
