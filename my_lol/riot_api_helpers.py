@@ -100,8 +100,53 @@ def get_matches_for_account(account_id, champion=None, queue=None, season=None, 
     except (KeyError, TypeError, ValueError):
         return None
 
+def get_match_for_match_id(match_id):
+    """Requests a matchDto for a match ID. Each contains:
+    NAME	                DATA TYPE	                            DESCRIPTION
+    gameId	                long	
+    participantIdentities	List[ParticipantIdentityDto]	        Participant identity information. Participant identity information is purposefully excluded for custom games.   
+    queueId	                int	                                    Please refer to the Game Constants documentation.
+    gameType	            string	                                Please refer to the Game Constants documentation.
+    gameDuration	        long	                                Match duration in seconds.
+    teams	                List[TeamStatsDto]	                    Team information.
+    platformId	            string	                                Platform where the match was played.
+    gameCreation	        long	                                Designates the timestamp when champion select ended and the loading screen appeared, NOT when the game timer was at 0:00.
+    seasonId	            int	                                    Please refer to the Game Constants documentation.
+    gameVersion	            string	                                The major.minor version typically indicates the patch the match was played on.
+    mapId	                int	                                    Please refer to the Game Constants documentation.
+    gameMode	            string	                                Please refer to the Game Constants documentation.
+    participants	        List[ParticipantDto]	                Participant information.
+
+    Args:
+        match_id ([int]): [Match Id, obtainable from get_matches_for_account]
+
+    Returns:
+        [string]: [match_dto]
+    """
+    api_key = os.getenv("API_KEY")
+
+    # Arrange headers
+    headers_dict = {"X-Riot-Token":api_key}
+
+    try:
+        response = requests.get(f"https://euw1.api.riotgames.com//lol/match/v4/matches/{match_id}", headers=headers_dict)
+        response.raise_for_status()
+    except requests.RequestException:
+        return None
+
+    # Parse result
+    try:
+        response_content = response.content
+        json_response_content = json.loads(response_content.decode('utf-8'))
+        return json_response_content
+    except (KeyError, TypeError, ValueError):
+        return None
+
 # Basic Integration Test:
 
 #george = get_summoner_by_name("George")
-#george_ekko_matches = get_matches_for_account(george["account_id"], 245)
+#george_nunu_matches = get_matches_for_account(george["account_id"], 20)
+#first_george_nunu_match_reference = george_nunu_matches.get("matches")[0]
+#first_george_nunu_match = get_match_for_match_id(first_george_nunu_match_reference.get("gameId"))
+
 
