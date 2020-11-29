@@ -12,22 +12,30 @@ load_dotenv()
 
 # Configure application
 app = Flask(__name__)
-app.config['MYSQL_USER'] = os.getenv("MYSQL_USER")
-app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_PASSWORD")
-app.config['MYSQL_HOST'] = os.getenv("MYSQL_HOST")
-app.config['MYSQL_DB'] = os.getenv("MYSQL_DB")
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-db = mysql.connector.connect(
-    host = 'localhost',
-    user = 'root',
-    passwd = 'root',
-    database = 'testdatabase')
+# Ensure responses aren't cached
+@app.after_request
+def after_request(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Expires"] = 0
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 # Configure access to MySQL database
+db = mysql.connector.connect(
+    host = os.getenv("MYSQL_HOST"),
+    user = os.getenv("MYSQL_USER"),
+    passwd = os.getenv("MYSQL_PASSWORD"),
+    database = os.getenv("MYSQL_DB"))
+
+# Make sure API key is set
+if not os.environ.get("API_KEY"):
+    raise RuntimeError("API_KEY not set")
 
 @app.route('/')
 def index():
+    cursor = db.cursor()
+    cursor.execute('CREATE TABLE person (person_id int PRIMARY KEY AUTO_INCREMENT, summoner_id VARCHAR(256), account_id VARCHAR(256), name varchar(256), revision_date varchar(256), summoner_level int)')
     return('Done!')
 
 if __name__ == '__main__':
