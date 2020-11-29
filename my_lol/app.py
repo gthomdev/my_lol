@@ -13,6 +13,9 @@ load_dotenv()
 # Configure application
 app = Flask(__name__)
 
+# Ensure templates are auto-reloaded
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
@@ -22,11 +25,19 @@ def after_request(response):
     return response
 
 # Configure access to MySQL database
-db = mysql.connector.connect(
+db_connection = mysql.connector.connect(
     host = os.getenv("MYSQL_HOST"),
     user = os.getenv("MYSQL_USER"),
     passwd = os.getenv("MYSQL_PASSWORD"),
     database = os.getenv("MYSQL_DB"))
+
+# Configure session to use filesystem (instead of signed cookies)
+app.config["SESSION_FILE_DIR"] = mkdtemp()
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+db = db_connection.cursor()
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -34,8 +45,9 @@ if not os.environ.get("API_KEY"):
 
 @app.route('/')
 def index():
-    cursor = db.cursor()
-    cursor.execute('CREATE TABLE person (person_id int PRIMARY KEY AUTO_INCREMENT, summoner_id VARCHAR(256), account_id VARCHAR(256), name varchar(256), revision_date varchar(256), summoner_level int)')
+    """Show homepage with form to submit Summoner Name"""
+    if request.method=="GET":
+
     return('Done!')
 
 if __name__ == '__main__':
