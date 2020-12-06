@@ -48,7 +48,7 @@ if not os.environ.get("API_KEY"):
 def index():
     """Show homepage with form to submit Summoner Name"""
     if request.method=="GET":
-        return('Done!')
+        return render_template("index.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
