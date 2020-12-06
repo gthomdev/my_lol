@@ -144,9 +144,10 @@ def get_match_for_match_id(match_id):
 
 # Basic Integration Test:
 
-#george = get_summoner_by_name("George")
-#george_nunu_matches = get_matches_for_account(george["account_id"], 20)
-#first_george_nunu_match_reference = george_nunu_matches.get("matches")[0]
-#first_george_nunu_match = get_match_for_match_id(first_george_nunu_match_reference.get("gameId"))
+george = get_summoner_by_name("George")
+george_nunu_matches = get_matches_for_account(george["account_id"], 20)
+print(george_nunu_matches)
+first_george_nunu_match_reference = george_nunu_matches.get("matches")[0]
+first_george_nunu_match = get_match_for_match_id(first_george_nunu_match_reference.get("gameId"))
 
 

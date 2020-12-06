@@ -44,7 +44,7 @@ db = db_connection.cursor()
 if not os.environ.get("API_KEY"):
     raise RuntimeError("API_KEY not set")
 
-@app.route('/', methods=["GET", "POST"])
+@app.route('/', methods=["GET"])
 def index():
     """Show homepage with form to submit Summoner Name"""
     if request.method=="GET":
@@ -60,6 +60,15 @@ def summoner():
             db.execute(statement,statement_data)
             db_connection.commit()
             return redirect("/")
+
+# For each game in match history we need
+# Win/Loss
+# Champion Played
+# Score
+# Item 1,2,3,4,5,6
+# Other participants, their team, their champion, their summoner name  
+
+# To start with we just need the last 10 games the summoner played, their champion and their outcome
 
 if __name__ == '__main__':
     app.run(debug=True)
