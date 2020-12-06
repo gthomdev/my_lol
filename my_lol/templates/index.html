@@ -1,0 +1,13 @@
+{% extends "layout.html"%}
+{% block title %}
+Index
+{% endblock %}
+
+{% block main %}
+<form class="summoner-search-form" action="/summoner" autocomplete="off" method="POST">
+    <div class="form-group">
+        <input autocomplete="off" autofocus class="form-control" name="summoner" placeholder="Summoner Name" type="text">
+    </div>
+    <button class="btn btn-primary" type="submit">Search</button>
+</form>
+{% endblock %}
