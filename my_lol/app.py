@@ -1,5 +1,5 @@
 import os
-import riot_api_helpers
+from riot_api_helpers import get_summoner_by_name, get_matches_for_account, get_match_for_match_id
 import mysql.connector
 from dotenv import load_dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
@@ -44,11 +44,22 @@ db = db_connection.cursor()
 if not os.environ.get("API_KEY"):
     raise RuntimeError("API_KEY not set")
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def index():
     """Show homepage with form to submit Summoner Name"""
     if request.method=="GET":
         return render_template("index.html")
+
+@app.route('/summoner', methods=["POST"])
+def summoner():
+        if request.method=="POST":
+            requested_summoner = request.form.get("summoner")
+            summoner_response_dict = get_summoner_by_name(requested_summoner)
+            statement = "INSERT INTO person (summoner_id, account_id, name, summoner_level) VALUES(%s, %s, %s, %s)"
+            statement_data = [summoner_response_dict["id"], summoner_response_dict["account_id"], summoner_response_dict["name"], summoner_response_dict["summoner_level"]]
+            db.execute(statement,statement_data)
+            db_connection.commit()
+            return redirect("/")
 
 if __name__ == '__main__':
     app.run(debug=True)
