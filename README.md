@@ -22,4 +22,4 @@ The APIs that are used are well documented by Riot in their [Developer hub](http
 
 ## Project Status
 
-I am currently working on the API helper functions.
+This project is no longer being worked on 

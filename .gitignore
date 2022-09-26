@@ -138,3 +138,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+*.vsidx
+/.vs/my_lol/FileContentIndex/read.lock
+/.vs/my_lol/v17/.suo
+/.vs/slnx.sqlite
+/.vs/my_lol/FileContentIndex/write.lock
+/.vs/VSWorkspaceState.json
